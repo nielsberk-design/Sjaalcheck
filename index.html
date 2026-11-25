@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sjaal ontwerpcheck</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23b8432f'/%3E%3Cpath d='M7 9l4.5 8L16 9M16 9l4.5 8L25 9M7 17l4.5 8 4.5-8M16 17l4.5 8 4.5-8' stroke='%23fff' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="8" fill="currentColor"/>
+        <path d="M7 9l4.5 8L16 9M16 9l4.5 8L25 9M7 17l4.5 8 4.5-8M16 17l4.5 8 4.5-8" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <h1>Sjaal ontwerpcheck</h1>
+        <p>Gebreide sjaal · standaard resolutie (grove steek)</p>
+      </div>
+    </div>
+    <div class="specline" id="specline"></div>
+  </header>
+
+  <main class="app is-empty" id="app">
+    <!-- Linkerkolom: invoer en instellingen -->
+    <aside class="card sidebar">
+      <section class="block">
+        <h2>Ontwerp</h2>
+        <label class="drop" id="drop0">
+          <input type="file" accept=".png,.jpg,.jpeg,.webp,.pdf,image/png,image/jpeg,image/webp,application/pdf" hidden>
+          <span class="drop-side">Voorzijde</span>
+          <span class="drop-file">Sleep een PNG, JPG of PDF hierheen, of klik om te kiezen</span>
+        </label>
+        <div class="field pdfpage" id="page0" hidden>
+          <label>PDF-pagina</label>
+          <select></select>
+        </div>
+
+        <div class="field">
+          <label>Achterzijde (tubulair gebreid)</label>
+          <div class="seg full" id="backMode">
+            <button type="button" data-v="inverse" class="on" title="Zelfde ontwerp, achterzijde in andere garens (standaard omgewisseld)">Andere kleuren</button>
+            <button type="button" data-v="same" title="Achterzijde precies gelijk aan de voorzijde">Gelijk</button>
+            <button type="button" data-v="custom" title="Een eigen ontwerp voor de achterzijde">Eigen ontwerp</button>
+          </div>
+        </div>
+        <label class="drop" id="drop1" hidden>
+          <input type="file" accept=".png,.jpg,.jpeg,.webp,.pdf,image/png,image/jpeg,image/webp,application/pdf" hidden>
+          <span class="drop-side">Achterzijde</span>
+          <span class="drop-file">Sleep een PNG, JPG of PDF hierheen, of klik om te kiezen</span>
+        </label>
+        <div class="field pdfpage" id="page1" hidden>
+          <label>PDF-pagina achterzijde</label>
+          <select></select>
+        </div>
+        <button type="button" class="link" id="demoBtn">Probeer een voorbeeldontwerp</button>
+      </section>
+
+      <section class="block">
+        <h2>Formaat &amp; steken</h2>
+        <div class="field">
+          <label for="size">Formaat</label>
+          <select id="size">
+            <option value="17x180" selected>17 × 180 cm · extra lang</option>
+            <option value="17x160">17 × 160 cm · iets langer</option>
+            <option value="17x140">17 × 140 cm · standaard</option>
+            <option value="15x110">15 × 110 cm · kids</option>
+          </select>
+        </div>
+        <div class="row3">
+          <div class="field">
+            <label for="stX">Steken/cm breed</label>
+            <input id="stX" type="number" min="1" max="12" step="0.5" value="3">
+          </div>
+          <div class="field">
+            <label for="stY">Rijen/cm hoog</label>
+            <input id="stY" type="number" min="1" max="20" step="0.5" value="5">
+          </div>
+          <div class="field">
+            <label for="maxColors">Max. kleuren</label>
+            <input id="maxColors" type="number" min="1" max="8" step="1" value="4">
+          </div>
+        </div>
+        <p class="note" id="gridNote"></p>
+      </section>
+
+      <section class="block">
+        <h2>Plaatsing</h2>
+        <div class="field">
+          <label>Draaien</label>
+          <div class="seg" id="rotation">
+            <button type="button" data-v="auto" class="on">Auto</button>
+            <button type="button" data-v="0">0°</button>
+            <button type="button" data-v="90">90°</button>
+            <button type="button" data-v="180">180°</button>
+            <button type="button" data-v="270">270°</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Als de verhouding niet klopt</label>
+          <div class="seg" id="fit">
+            <button type="button" data-v="contain" class="on" title="Hele ontwerp zichtbaar, aangevuld met de randkleur">Passend</button>
+            <button type="button" data-v="cover" title="Vult de sjaal, snijdt de rest weg">Vullen</button>
+            <button type="button" data-v="stretch" title="Uitrekken tot het formaat (vervormt)">Uitrekken</button>
+          </div>
+        </div>
+        <label class="check"><input type="checkbox" id="trimWhite"> Witte rand rondom het ontwerp wegsnijden</label>
+        <details class="crop">
+          <summary>Bijsnijden in %</summary>
+          <div class="row4">
+            <div class="field"><label for="cropT">Boven</label><input id="cropT" type="number" min="0" max="45" step="0.5" value="0"></div>
+            <div class="field"><label for="cropR">Rechts</label><input id="cropR" type="number" min="0" max="45" step="0.5" value="0"></div>
+            <div class="field"><label for="cropB">Onder</label><input id="cropB" type="number" min="0" max="45" step="0.5" value="0"></div>
+            <div class="field"><label for="cropL">Links</label><input id="cropL" type="number" min="0" max="45" step="0.5" value="0"></div>
+          </div>
+        </details>
+      </section>
+
+      <section class="block needs-design">
+        <h2>Garenkleuren <button type="button" class="link small" id="resetColors" title="Overal het dichtstbijzijnde garen gebruiken">automatisch</button></h2>
+        <div class="seg" id="colorMode">
+          <button type="button" data-v="yarn" class="on" title="Toon de sjaal in garens van de kleurenkaart">Garens</button>
+          <button type="button" data-v="design" title="Toon de sjaal in de kleuren uit je bestand">Ontwerpkleuren</button>
+        </div>
+        <p class="note">Elke kleur krijgt het dichtstbijzijnde garen van de kleurenkaart. Klik op een kleur om zelf een garen te kiezen. Kleine stip = kleur in je ontwerp.</p>
+        <ul class="palette" id="palette"></ul>
+        <div class="back-block" id="backBlock" hidden>
+          <div class="sub-h">Achterzijde</div>
+          <p class="note">Zelfde ontwerp in andere garens. Standaard zijn de twee hoofdkleuren omgewisseld. Klik op een garen om het te wijzigen.</p>
+          <ul class="back-list" id="backPalette"></ul>
+          <p class="note back-note" id="backNote"></p>
+        </div>
+        <div class="field">
+          <label>Uiteinden</label>
+          <div class="seg" id="fringe">
+            <button type="button" data-v="on" class="on">Franjes</button>
+            <button type="button" data-v="off">Dichtgestikt</button>
+          </div>
+        </div>
+        <div class="field" id="fringeField">
+          <label>Franjekleuren (max. 3)</label>
+          <div class="chips" id="fringeColors"></div>
+        </div>
+      </section>
+    </aside>
+
+    <!-- Midden: overzicht en detailweergave -->
+    <section class="stage">
+      <div class="card overview needs-design">
+        <div class="overview-head">
+          <h2>Hele sjaal</h2>
+          <span class="note">Klik of sleep om naar een plek te gaan · <button type="button" class="link small" id="flipOverview" title="Overzicht 180° draaien, bijvoorbeeld als tekst op z'n kop staat">↻ draai 180°</button></span>
+        </div>
+        <canvas id="overview"></canvas>
+      </div>
+
+      <div class="card viewer">
+        <div class="toolbar needs-design">
+          <div class="seg multi" id="panels" title="Kies welke weergaven naast elkaar staan">
+            <button type="button" data-v="orig" class="on">Origineel</button>
+            <button type="button" data-v="grid">Steekraster</button>
+            <button type="button" data-v="knit" class="on">Gebreid</button>
+          </div>
+          <div class="seg" id="sideSel" hidden>
+            <button type="button" data-v="0" class="on">Voorzijde</button>
+            <button type="button" data-v="1">Achterzijde</button>
+          </div>
+          <label class="check"><input type="checkbox" id="markers" checked> Markeringen</label>
+          <div class="zoom">
+            <button type="button" class="icon" id="zoomOut" title="Uitzoomen">−</button>
+            <input type="range" id="zoomRange" min="0" max="1000" value="500" aria-label="Zoom">
+            <button type="button" class="icon" id="zoomIn" title="Inzoomen">+</button>
+            <span class="zoom-label" id="zoomLabel"></span>
+            <button type="button" id="zoomReal" title="Ongeveer 1:1 op een gewoon scherm">Ware grootte</button>
+            <button type="button" id="zoomFit">Hele lengte</button>
+          </div>
+        </div>
+        <div class="viewer-body" id="viewerBody">
+          <canvas></canvas>
+          <div class="viewer-scroll"><div class="viewer-spacer"></div></div>
+          <div class="viewer-tip" hidden></div>
+          <div class="empty" id="empty">
+            <div class="empty-inner">
+              <svg viewBox="0 0 120 64" aria-hidden="true" class="empty-art">
+                <g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 10l10 16 10-16M30 10l10 16 10-16M50 10l10 16 10-16M70 10l10 16 10-16M90 10l10 16 10-16"/>
+                  <path d="M10 30l10 16 10-16M30 30l10 16 10-16M50 30l10 16 10-16M70 30l10 16 10-16M90 30l10 16 10-16" opacity=".55"/>
+                </g>
+              </svg>
+              <h3>Sleep je sjaalontwerp hierheen</h3>
+              <p>PNG, JPG of PDF. Je ziet direct hoe het eruitziet in breisteken, en wat er aangepast moet worden.</p>
+              <div class="empty-actions">
+                <button type="button" class="primary" id="emptyPick">Bestand kiezen</button>
+                <button type="button" id="emptyDemo">Voorbeeld bekijken</button>
+              </div>
+            </div>
+          </div>
+          <div class="busy" id="busy" hidden><span class="spinner"></span> Bezig met omzetten…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rechterkolom: oordeel, controles, downloads, tips -->
+    <aside class="card results">
+      <div class="verdict" id="verdict">
+        <div class="verdict-title">Nog geen ontwerp</div>
+        <div class="verdict-text">Voeg een ontwerp toe om het te controleren.</div>
+      </div>
+
+      <section class="block needs-design">
+        <h2>Controles</h2>
+        <ul class="checks" id="checks"></ul>
+      </section>
+
+      <section class="block needs-design">
+        <h2>Downloaden</h2>
+        <div class="downloads">
+          <button type="button" id="exportGrid">Steekpatroon (PNG, 1 px = 1 steek)</button>
+          <button type="button" id="exportKnit">Gebreide preview (PNG)</button>
+          <button type="button" id="copyColors">Kleurenlijst kopiëren (garens + PMS)</button>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Specificaties</h2>
+        <dl class="specs" id="specs"></dl>
+      </section>
+
+      <details class="block tips" open>
+        <summary><h2>Tips voor de grove steek</h2></summary>
+        <ul>
+          <li><b>Vlakke kleuren.</b> Geen verlopen, schaduwen, glans of foto's.</li>
+          <li><b>Lijnen minimaal 2 steken dik:</b> ±7 mm voor lijnen in de lengte, ±4 mm voor lijnen dwars over de sjaal.</li>
+          <li><b>Tekst groot en vet.</b> Een leesbare letter heeft minimaal ±7 steken. Vermijd dunne en schreefletters.</li>
+          <li><b>Houd afstand tot de zijkant.</b> De sjaal is een koker; de zijkant is een vouw.</li>
+          <li><b>Max. 4 draadkleuren</b> voor de hele sjaal, gekozen uit de 62 voorraadgarens. Geef de garennamen of PMS-codes door; schermkleuren zijn een indicatie.</li>
+          <li><b>Twijfel?</b> Kies een sample ter goedkeur. Zonder sample vervalt het recht op reclamatie over de omzetting naar breipatroon.</li>
+        </ul>
+        <p class="note">Maak je ontwerp op de <a href="https://www.merchlab.nl/gebreide-sjaals-standaard-resolutie" target="_blank" rel="noopener">werktekening van de leverancier</a> (onder Downloads op de productpagina).</p>
+        <p class="note">Dit is een onafhankelijke controletool, niet van MerchLab zelf. Formaten, kleurmaximum en garenkleuren komen van hun productpagina en kleurenkaart. De schermkleuren zijn een indicatie; bij twijfel beslist de leverancier.</p>
+      </details>
+    </aside>
+  </main>
+
+  <div class="yarn-picker" id="yarnPicker" role="dialog" aria-label="Garen kiezen" hidden></div>
+  <div class="copy-modal" id="copyModal" role="dialog" aria-label="Kleurenlijst" hidden>
+    <div class="copy-box">
+      <b>Kleurenlijst</b>
+      <p class="note">Automatisch kopiëren lukte niet. De tekst is geselecteerd: kopieer hem met Cmd+C of Ctrl+C.</p>
+      <textarea id="copyText" readonly rows="10"></textarea>
+      <button type="button" id="copyClose">Sluiten</button>
+    </div>
+  </div>
+  <div class="toast" id="toast" hidden></div>
+  <div class="dropveil" id="dropveil" hidden><div>Laat los om te controleren</div></div>
+
+  <script src="vendor/pdfjs/pdf.min.js"></script>
+  <script src="js/color.js"></script>
+  <script src="js/yarns.js"></script>
+  <script src="js/loader.js"></script>
+  <script src="js/process.js"></script>
+  <script src="js/checks.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
